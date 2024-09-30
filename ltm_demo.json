@@ -1,0 +1,74 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "label": "",
+        "remark": "",
+        "LTM_Demo": {
+            "class": "Tenant",
+            "Shared": {
+                "class": "Application",
+                "template": "shared",
+                "pl_ltm_demo": {
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 8000,
+                            "serverAddresses": [
+                                "10.0.2.60", 
+                                "10.0.2.61",
+                                "10.0.2.62",
+                                "10.0.2.63"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "App_HTTPS":{
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTPS",
+                    "virtualAddresses": [
+                        "192.168.57.64"
+                    ],
+                    "pool": "/LTM_Demo/Shared/pl_ltm_demo",
+                    "serverTLS": "webTLS",
+                    "profileHTTP": {
+                        "use": "httpProfile"
+                    },
+                    "persistenceMethods": [{
+                        "use": "cookiePersist"
+                    }]
+                },
+                "httpProfile": {
+                    "class": "HTTP_Profile",
+                    "xForwardedFor": true
+                },
+                "cookiePersist": {
+                    "class": "Persist",
+                    "persistenceMethod": "cookie",
+                    "cookieMethod": "insert",
+                    "duration": 60
+                  },
+                "webTLS": {
+                    "class": "TLS_Server",
+                    "certificates": [{
+                        "certificate": "webcert"
+                    }]
+                },
+                "webcert": {
+                    "class": "Certificate",
+                    "certificate": {"bigip":"/Common/EC_wildcard_appsec.rocks"},
+                    "privateKey": {"bigip":"/Common/EC_wildcard_appsec.rocks"}
+                }
+            }
+        }
+    }
+}

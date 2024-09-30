@@ -1,0 +1,69 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "label": "Demo WAF",
+        "remark": "Demo AS3 WAF Deployment",
+        "SecuredByWAF": {
+            "class": "Tenant",
+            "Shared": {
+                "class": "Application",
+                "template": "shared",
+                "pl_php-dev": {
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 80,
+                            "serverAddresses": [
+                                "10.0.2.60"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "App_HTTP": {
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTP",
+                    "virtualAddresses": [
+                        "192.168.57.63"
+                    ],
+                    "pool": "/SecuredByWAF/Shared/pl_php-dev"
+                }
+            },
+            "App_HTTPS":{
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTPS",
+                    "virtualAddresses": [
+                        "192.168.57.63"
+                    ],
+                    "pool": "/SecuredByWAF/Shared/pl_php-dev",
+                    "serverTLS": "webTLS",
+                    "redirect80": false,
+                    "policyWAF": {"bigip": "/Common/sec_rating_based"},
+                    "securityLogProfiles": [ {"bigip": "/Common/Log all requests"} ],
+                    "iRules": [ {"bigip": "/Common/rule_waf_switching"} ]
+                },
+                "webTLS": {
+                    "class": "TLS_Server",
+                    "certificates": [{
+                        "certificate": "webcert"
+                    }]
+                },
+                "webcert": {
+                    "class": "Certificate",
+                    "certificate": {"bigip":"/Common/EC_wildcard_appsec.rocks"},
+                    "privateKey": {"bigip":"/Common/EC_wildcard_appsec.rocks"}
+                }
+            }
+        }
+    }
+}

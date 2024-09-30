@@ -1,0 +1,65 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "XC_BotDefense": {
+            "class": "Tenant",
+            "Shared": {
+                "class": "Application",
+                "template": "shared",
+                "pl_xc_botdefense": {
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 80,
+                            "serverAddresses": [
+                                "10.0.2.60"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "App_HTTPS":{
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTPS",
+                    "virtualAddresses": [
+                        "192.168.57.65"
+                    ],
+                    "remark": "XC_BotDefense - registration.secure.appsec.rocks",
+                    "label": "XC_BotDefense - registration.secure.appsec.rocks",
+                    "pool": "/XC_BotDefense/Shared/pl_xc_botdefense",
+                    "serverTLS": "webTLS",
+                    "profileHTTP": {
+                        "use": "httpProfile"
+                    },
+                    "profileIntegratedBotDefense":{
+                        "bigip": "/Common/bd_XC"
+                    }
+                },
+                "httpProfile": {
+                    "class": "HTTP_Profile",
+                    "xForwardedFor": true
+                },
+                "webTLS": {
+                    "class": "TLS_Server",
+                    "certificates": [{
+                        "certificate": "webcert"
+                    }]
+                },
+                "webcert": {
+                    "class": "Certificate",
+                    "certificate": {"bigip":"/Common/EC_wildcard_appsec.rocks"},
+                    "privateKey": {"bigip":"/Common/EC_wildcard_appsec.rocks"}
+                }
+            }
+        }
+    }
+}

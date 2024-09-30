@@ -1,0 +1,132 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "id": "SSH_Virtuals",
+        "label": "SSH_Virtuals",
+        "remark": "Virtual Servers for SSH access to backend",
+        "SSH_Virtuals": {
+            "class": "Tenant",
+            "Shared": {
+                "class": "Application",
+                "template": "shared",
+                "fastL4_ssh": {
+                    "class": "L4_Profile",
+                    "idleTimeout": 86400
+                }
+            },
+            "vs_WebServer_ssh": {
+                "class": "Application",
+                "label": "",
+                "remark": "php-dev",
+                "service": {
+                    "class": "Service_L4",
+                    "virtualAddresses": [
+                        "192.168.57.60"
+                    ],
+                    "virtualPort": 22,
+                    "profileL4": {
+                        "use": "/SSH_Virtuals/Shared/fastL4_ssh"
+                    },
+                    "pool": "pl_WebServer_ssh"
+                },
+                "pl_WebServer_ssh": {
+                    "class": "Pool",
+                    "members": [
+                        {
+                            "servicePort": 22,
+                            "serverAddresses": [
+                                "10.0.2.60"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "vs_NGINX_ssh": {
+                "class": "Application",
+                "label": "",
+                "remark": "NGINX OSS",
+                "service": {
+                    "class": "Service_L4",
+                    "virtualAddresses": [
+                        "192.168.57.80"
+                    ],
+                    "virtualPort": 22,
+                    "profileL4": {
+                        "use": "/SSH_Virtuals/Shared/fastL4_ssh"
+                    },
+                    "pool": "pl_NGINX_ssh"
+                },
+                "pl_NGINX_ssh": {
+                    "class": "Pool",
+                    "members": [
+                        {
+                            "servicePort": 22,
+                            "serverAddresses": [
+                                "10.0.2.80"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "vs_go-gin-api_ssh": {
+                "class": "Application",
+                "label": "",
+                "remark": "Go Gin API",
+                "service": {
+                    "class": "Service_L4",
+                    "virtualAddresses": [
+                        "192.168.57.100"
+                    ],
+                    "virtualPort": 22,
+                    "profileL4": {
+                        "use": "/SSH_Virtuals/Shared/fastL4_ssh"
+                    },
+                    "pool": "pl_go-gin-api_ssh"
+                },
+                "pl_go-gin-api_ssh": {
+                    "class": "Pool",
+                    "members": [
+                        {
+                            "servicePort": 22,
+                            "serverAddresses": [
+                                "10.0.2.100"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "vs_elk-stack_ssh": {
+                "class": "Application",
+                "label": "",
+                "remark": "ELK Stack",
+                "service": {
+                    "class": "Service_L4",
+                    "virtualAddresses": [
+                        "192.168.57.50"
+                    ],
+                    "virtualPort": 22,
+                    "profileL4": {
+                        "use": "/SSH_Virtuals/Shared/fastL4_ssh"
+                    },
+                    "pool": "pl_elk-stack_ssh"
+                },
+                "pl_elk-stack_ssh": {
+                    "class": "Pool",
+                    "members": [
+                        {
+                            "servicePort": 22,
+                            "serverAddresses": [
+                                "10.0.2.50"
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

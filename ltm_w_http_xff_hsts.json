@@ -1,0 +1,87 @@
+{
+  "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+  "class": "ADC",
+  "schemaVersion": "3.0.0",
+  "id": "HTTP_PROFILE_ENFORCEMENT_PROPS",
+  "Enforcement_Tenant": {
+      "class": "Tenant",
+      "Enforcement_Application": {
+          "class": "Application",
+          "service": {
+              "class": "Service_HTTPS",
+              "virtualPort": 443,
+              "virtualAddresses": [
+                  "1.2.3.4"
+              ],
+              "profileHTTP": {
+                  "use": "httpProfileHSTS_prod"
+              },
+              "serverTLS": {
+                "bigip": "/Common/someprofile"
+              }
+          },
+          "httpProfileHSTS_prod": {
+              "class": "HTTP_Profile",
+              "proxyType": "reverse",
+              "label": "HTTP Profile w. XFF and HSTS for prod",
+              "remark": "HTTP Profile w. XFF and HSTS for prod",
+              "xForwardedFor": true,
+              "allowBlankSpaceAfterHeaderName": false,
+              "enforceRFCCompliance": false,
+              "truncatedRedirects": false,
+              "maxHeaderSize": 32768,
+              "maxHeaderCount": 64,
+              "pipelineAction": "allow",
+              "unknownMethodAction": "allow",
+              "knownMethods": [
+                  "CONNECT",
+                  "DELETE",
+                  "GET",
+                  "HEAD",
+                  "LOCK",
+                  "OPTIONS",
+                  "POST",
+                  "PROPFIND",
+                  "PUT",
+                  "TRACE",
+                  "UNLOCK"
+              ],
+              "hstsInsert": true,
+              "hstsPeriod": 31536000,
+              "hstsIncludeSubdomains": true,
+              "hstsPreload": true
+          },
+          "httpProfileHSTS_preprod": {
+            "class": "HTTP_Profile",
+            "proxyType": "reverse",
+            "label": "HTTP Profile w. XFF and HSTS for preprod",
+            "remark": "HTTP Profile w. XFF and HSTS for preprod",
+            "xForwardedFor": true,
+            "allowBlankSpaceAfterHeaderName": false,
+            "enforceRFCCompliance": false,
+            "truncatedRedirects": false,
+            "maxHeaderSize": 32768,
+            "maxHeaderCount": 64,
+            "pipelineAction": "allow",
+            "unknownMethodAction": "allow",
+            "knownMethods": [
+                "CONNECT",
+                "DELETE",
+                "GET",
+                "HEAD",
+                "LOCK",
+                "OPTIONS",
+                "POST",
+                "PROPFIND",
+                "PUT",
+                "TRACE",
+                "UNLOCK"
+            ],
+            "hstsInsert": true,
+            "hstsPeriod": 86400,
+            "hstsIncludeSubdomains": true,
+            "hstsPreload": true
+        }
+      }
+  }
+}
