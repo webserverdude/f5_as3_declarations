@@ -1,0 +1,55 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "label": "",
+        "remark": "",
+        "LTM_Demo": {
+            "class": "Tenant",
+            "Shared": {
+                "class": "Application",
+                "template": "shared",
+                "remote-rsyslog-publisher": {
+                    "class": "Log_Publisher",
+                    "destinations": [
+                        {
+                            "use": "log-dest-rsyslog"
+                        }
+                    ]
+                },
+                "log-dest-rsyslog": {
+                    "class": "Log_Destination",
+                    "type": "remote-syslog",
+                    "remoteHighSpeedLog": {
+                        "use": "log-dest-hsl"
+                    }
+                },
+                "log-dest-hsl": {
+                    "class": "Log_Destination",
+                    "type": "remote-high-speed-log",
+                    "pool": {
+                        "use": "logPool"
+                    }
+                },
+                "logPool": {
+                    "class": "Pool",
+                    "monitors": [
+                        "icmp"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 514,
+                            "serverAddresses": [
+                                "10.0.2.151"
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

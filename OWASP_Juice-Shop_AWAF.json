@@ -1,0 +1,54 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "label": "OWASP Juice Shop",
+        "remark": "OWASP Juice Shop",
+        "OWASPJuiceShop": {
+            "class": "Tenant",
+            "App_HTTPS":{
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTPS",
+                    "virtualAddresses": [
+                        "192.168.57.31"
+                    ],
+                    "pool": "pl_juice-shop_http",
+                    "serverTLS": "webTLS",
+                    "redirect80": true,
+                    "policyWAF": {"bigip": "/Common/sec_rating_based"},
+                    "securityLogProfiles": [ {"bigip": "/Common/Log all requests"} ]
+                },
+                "webTLS": {
+                    "class": "TLS_Server",
+                    "certificates": [{
+                        "certificate": "webcert"
+                    }]
+                },
+                "webcert": {
+                    "class": "Certificate",
+                    "certificate": {"bigip":"/Common/EC_wildcard_appsec.rocks"},
+                    "privateKey": {"bigip":"/Common/EC_wildcard_appsec.rocks"}
+                },
+                "pl_juice-shop_http": {
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 3000,
+                            "serverAddresses": [
+                                "10.0.2.31"
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
