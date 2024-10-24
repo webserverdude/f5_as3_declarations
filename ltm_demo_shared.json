@@ -8,7 +8,7 @@
         "schemaVersion": "3.0.0",
         "label": "",
         "remark": "",
-        "LTM_Demo": {
+        "Common": {
             "class": "Tenant",
             "Shared": {
                 "class": "Application",

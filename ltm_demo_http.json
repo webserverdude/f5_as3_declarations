@@ -1,82 +1,84 @@
 {
     "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
     "class": "AS3",
-    "action": "patch",
+    "action": "deploy",
     "persist": true,
-    "patchBody": [
-                    {
-                        "op": "add",
-                        "path": "/LTM_Demo/App_HTTPS",
-                        "value": {
-                                "class": "Application",
-                                "service": {
-                                    "class": "Service_HTTPS",
-                                    "virtualAddresses": [
-                                        "192.168.57.64"
-                                    ],
-                                    "profileAnalytics": { "use": "pr_analytics_http"},
-                                    "pool": "pl_ltm_demo",
-                                    "serverTLS": "webTLS",
-                                    "profileHTTP": {
-                                        "use": "httpProfile"
-                                    }
-                                },
-                                "pl_ltm_demo": {
-                                    "class": "Pool",
-                                    "monitors": [
-                                        "http"
-                                    ],
-                                    "members": [
-                                        {
-                                            "servicePort": 8000,
-                                            "serverAddresses": [
-                                                "10.0.2.61", 
-                                                "10.0.2.62",
-                                                "10.0.2.63",
-                                                "10.0.2.65"
-                                            ]
-                                        }
-                                    ]
-                                },
-                                "httpProfile": {
-                                    "class": "HTTP_Profile",
-                                    "xForwardedFor": true
-                                },
-                                "webTLS": {
-                                    "class": "TLS_Server",
-                                    "certificates": [{
-                                        "certificate": "webcert"
-                                    }]
-                                },
-                                "webcert": {
-                                    "class": "Certificate",
-                                    "certificate": {"bigip":"/Common/EC_wildcard_appsec.rocks"},
-                                    "privateKey": {"bigip":"/Common/EC_wildcard_appsec.rocks"}
-                                },
-                                "pr_analytics_http": {
-                                    "class": "Analytics_Profile",
-                                    "collectedStatsInternalLogging": true,
-                                    "collectedStatsExternalLogging": true,
-                                    "capturedTrafficInternalLogging": false,
-                                    "capturedTrafficExternalLogging": false,
-                                    "collectMaxTpsAndThroughput": true,
-                                    "collectPageLoadTime": true,
-                                    "collectClientSideStatistics": true,
-                                    "collectUserSession": true,
-                                    "collectUrl": true,
-                                    "collectGeo": false,
-                                    "collectIp": false,
-                                    "collectSubnet": false,
-                                    "collectResponseCode": true,
-                                    "collectUserAgent": true,
-                                    "collectMethod": true,
-                                    "collectOsAndBrowser": true,
-                                    "externalLoggingPublisher": {
-                                        "use": "/LTM_Demo/Shared/remote-rsyslog-publisher"
-                                    }
-                                }
-                            }
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "label": "",
+        "remark": "",
+        "LTM_Demo": {
+            "class": "Tenant",
+            "App_HTTPS":{
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTPS",
+                    "virtualAddresses": [
+                        "192.168.57.64"
+                    ],
+                    "profileAnalytics": { "use": "pr_analytics_http"},
+                    "pool": "pl_ltm_demo",
+                    "serverTLS": "webTLS",
+                    "profileHTTP": {
+                        "use": "httpProfile"
+                    }
+                },
+                "pl_ltm_demo": {
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 8000,
+                            "serverAddresses": [
+                                "10.0.2.61", 
+                                "10.0.2.62",
+                                "10.0.2.63",
+                                "10.0.2.65"
+                            ]
                         }
-    
-                ]
+                    ]
+                },
+                "httpProfile": {
+                    "class": "HTTP_Profile",
+                    "xForwardedFor": true
+                },
+                "webTLS": {
+                    "class": "TLS_Server",
+                    "certificates": [{
+                        "certificate": "webcert"
+                    }]
+                },
+                "webcert": {
+                    "class": "Certificate",
+                    "certificate": {"bigip":"/Common/EC_wildcard_appsec.rocks"},
+                    "privateKey": {"bigip":"/Common/EC_wildcard_appsec.rocks"}
+                },
+                "pr_analytics_http": {
+                    "class": "Analytics_Profile",
+                    "collectedStatsInternalLogging": true,
+                    "collectedStatsExternalLogging": true,
+                    "capturedTrafficInternalLogging": false,
+                    "capturedTrafficExternalLogging": false,
+                    "collectMaxTpsAndThroughput": true,
+                    "collectPageLoadTime": true,
+                    "collectClientSideStatistics": true,
+                    "collectUserSession": true,
+                    "collectUrl": true,
+                    "collectGeo": false,
+                    "collectIp": false,
+                    "collectSubnet": false,
+                    "collectResponseCode": true,
+                    "collectUserAgent": true,
+                    "collectMethod": true,
+                    "collectOsAndBrowser": true,
+                    "externalLoggingPublisher": {
+                        "use": "/Common/Shared/remote-rsyslog-publisher"
+                    }
+                }    
+            }
+        }
+    }
 }
