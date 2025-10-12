@@ -1,0 +1,212 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "id": "LTM_Demo_v2",
+        "label": "LTM_Demo_v2",
+        "LTM_Demo_v2": {
+            "class": "Tenant",
+            "LTM_Demo_v2": {
+                "class": "Application",
+                "vs_ssh": {
+                    "class": "Service_L4",
+                    "virtualAddresses": [
+                        "192.168.57.71"
+                    ],
+                    "virtualPort": 22,
+                    "profileL4": {
+                        "use": "fastL4_ssh"
+                    },
+                    "persistenceMethods": [],
+                    "pool": "pl_ltm-demo_ssh",
+                    "snat": {
+                        "use": "pl_SNAT_addresses"
+                    }
+                },
+                "fastL4_ssh": {
+                    "class": "L4_Profile",
+                    "idleTimeout": 86400
+                },
+                "pl_ltm-demo_ssh": {
+                    "class": "Pool",
+                    "members": [
+                        {
+                            "servicePort": 22,
+                            "serverAddresses": [
+                                "10.0.2.71"
+                            ],
+                            "shareNodes": true
+                        }
+                    ]
+                },
+                "vs_http": {
+                    "class": "Service_HTTP",
+                    "virtualAddresses": [
+                        "192.168.57.71"
+                    ],
+                    "persistenceMethods": [],
+                    "profileHTTP": {
+                        "use": "pr_http_xff"
+                    },
+                    "pool": "pl_ltm-demo_http",
+                    "snat": {
+                        "use": "pl_SNAT_addresses"
+                    }
+                },
+                "vs_https": {
+                    "class": "Service_HTTPS",
+                    "virtualAddresses": [
+                        "192.168.57.71"
+                    ],
+                    "redirect80": false,
+                    "persistenceMethods": [{
+                        "use": "pr_cookie_hash"
+                    }],
+                    "profileHTTP": {
+                        "use": "pr_http_xff"
+                    },
+                    "pool": "pl_ltm-demo_https",
+                    "snat": {
+                        "use": "pl_SNAT_addresses"
+                    },
+                    "serverTLS": {
+                        "bigip": "/Common/clientssl"
+                    },
+                    "clientTLS": {
+                        "bigip": "/Common/serverssl"
+                    }
+                },
+                "pr_http_xff": {
+                    "class": "HTTP_Profile",
+                    "xForwardedFor": true
+                }                ,
+                "pl_ltm-demo_http": {
+                    "class": "Pool",
+                    "loadBalancingMode": "round-robin",
+                    "members": [
+                        {
+                            "servicePort": 8000,
+                            "serverAddresses": [
+                                "10.0.2.71",
+                                "10.0.2.72",
+                                "10.0.2.73",
+                                "10.0.2.74"
+                            ],  
+                            "shareNodes": true
+                        }
+                    ],
+                    "monitors": ["http"]
+                },
+                "pl_ltm-demo_https": {
+                    "class": "Pool",
+                    "members": [
+                        {
+                            "servicePort": 443,
+                            "serverAddresses": [
+                                "10.0.2.71",
+                                "10.0.2.72",
+                                "10.0.2.73",
+                                "10.0.2.74"
+                            ],
+                            "shareNodes": true
+                        }
+                    ],
+                    "monitors": ["https"]
+                },
+                "pl_ltm-demo_least_connection": {
+                    "class": "Pool",
+                    "loadBalancingMode": "least-connections-member",
+                    "members": [
+                        {
+                            "servicePort": 8000,
+                            "serverAddresses": [
+                                "10.0.2.71",
+                                "10.0.2.72",
+                                "10.0.2.73",
+                                "10.0.2.74"
+                            ],
+                            "monitors": ["http"],
+                            "shareNodes": true
+                        }
+                    ]
+                },
+                "pl_ltm-demo_prio_groups": {
+                    "class": "Pool",
+                    "loadBalancingMode": "least-connections-member",
+                    "members": [
+                        {
+                            "servicePort": 8000,
+                            "priorityGroup": 10,
+                            "serverAddresses": [
+                                "10.0.2.71",
+                                "10.0.2.72"
+                            ],
+                            "monitors": ["http"],
+                            "shareNodes": true
+                        },
+                        {
+                            "servicePort": 8000,
+                            "serverAddresses": [
+                                "10.0.2.73",
+                                "10.0.2.74"
+                            ],
+                            "monitors": ["http"],
+                            "shareNodes": true
+                        }
+                    ]
+                },
+                "pr_cookie_hash": {
+                    "class": "Persist",
+                    "persistenceMethod": "cookie",
+                    "cookieMethod": "hash",
+                    "cookieName": "X-Backend-Server",
+                    "duration": 60
+
+                },
+                "pr_cookie_basic": {
+                    "class": "Persist",
+                    "persistenceMethod": "cookie",
+                    "cookieMethod": "insert",
+                    "duration": 120
+
+                },
+                "pr_cookie_persist": {
+                    "class": "Persist",
+                    "persistenceMethod": "cookie",
+                    "cookieMethod": "insert",
+                    "cookieName": "LBSESSIONID",
+                    "duration": 60
+
+                },
+                "pr_cookie_secure_persist": {
+                    "class": "Persist",
+                    "persistenceMethod": "cookie",
+                    "cookieMethod": "insert",
+                    "cookieName": "LBSESSIONID",
+                    "duration": 60,
+                    "encrypt": true,
+                    "passphrase": {
+                        "allowReuse": true,
+                        "protected": "eyJhbGciOiJkaXIiLCJlbmMiOiJmNXN2In0=",
+                        "ciphertext": "UEAkJHcwcmQ="
+                    },
+                    "secure": true,
+                    "httpOnly": true
+
+                },
+                "pl_SNAT_addresses": {
+                    "class": "SNAT_Pool",
+                    "snatAddresses": [
+                        "10.0.2.247",
+                        "10.0.2.248",
+                        "10.0.2.249"
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,61 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "ephemeral_test": {
+            "class": "Tenant",
+            "App01": {
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTP",
+                    "virtualAddresses": [
+                        "192.168.57.66"
+                    ],
+                    "pool": "pool_ephemeral"
+                },
+                "pool_ephemeral": {
+                    "class": "Pool",
+                    "monitors": [{
+                        "use": "http_monitor"
+                }],
+                    "members": [
+                        {
+                            "servicePort": 80,
+                            "hostname": "astoundingwonderfulfunspell.neverssl.com",
+                            "autoPopulate": true,
+                            "addressDiscovery": "fqdn",
+                            "shareNodes": true
+                        }
+                    ]
+                },
+                "pool_ip": {
+                    "class": "Pool",
+                    "monitors": [{
+                        "use": "http_monitor"
+                }],
+                    "members": [
+                        {
+                            "servicePort": 80,
+                            "serverAddresses": [
+                                "34.223.124.45"
+                            ],
+                            "shareNodes": true
+                        }
+                    ]
+                },
+                "http_monitor": {
+                  "class": "Monitor",
+                  "monitorType": "http",
+                  "send": "GET /online/ HTTP/1.1\r\nHost: astoundingwonderfulfunspell.neverssl.com\r\nConnection: close\r\n\r\n",
+                  "receive": "HTTP/1.1 200 OK",
+                  "interval": 15,
+                  "timeout": 46
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,51 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "simple_testing": {
+            "class":"Tenant",
+            "responder_service": {
+                "class": "Application",
+                "service_http_200": {
+                    "class": "Service_HTTP",
+                    "virtualPort": 80,
+                    "virtualAddresses": [
+                        "1.1.1.1"
+                    ],
+                    "iRules": [{
+                        "use": "rule_http_200"
+                    }]
+                },
+                "rule_http_200": {
+                    "class": "iRule",
+                    "iRule": {
+                        "base64": "d2hlbiBIVFRQX1JFUVVFU1QgewogICBIVFRQOjpyZXNwb25kIDIwMCBjb250ZW50IHsKICAgICAgPGh0bWw+CiAgICAgICAgIDxoZWFkPgogICAgICAgICAgICA8dGl0bGU+QklHLUlQPC90aXRsZT4KICAgICAgICAgPC9oZWFkPgogICAgICAgICA8Ym9keT4KICAgICAgICAgICAgMjAwIE9LCiAgICAgICAgIDwvYm9keT4KICAgICAgPC9odG1sPgogICB9Cn0="
+                    }
+                }
+            },
+            "forwarding_service": {
+                "class": "Application",
+                "service_http": {
+                    "class": "Service_HTTP",
+                    "virtualPort": 80,
+                    "virtualAddresses": [
+                        "192.168.57.173"
+                    ],
+                    "iRules": [{
+                        "use": "rule_vs_forward"
+                    }]
+                },
+                "rule_vs_forward" : {
+                    "class": "iRule",
+                    "iRule": {
+                        "base64": "d2hlbiBIVFRQX1JFUVVFU1QgewogIHZpcnR1YWwgL3NpbXBsZV90ZXN0aW5nL3Jlc3BvbmRlcl9zZXJ2aWNlL3NlcnZpY2VfaHR0cF8yMDAKfQ=="
+                    }
+                }
+            }
+        }
+    }
+}

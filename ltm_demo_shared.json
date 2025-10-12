@@ -24,6 +24,7 @@
                 "log-dest-rsyslog": {
                     "class": "Log_Destination",
                     "type": "remote-syslog",
+                    "format": "rfc5424",
                     "remoteHighSpeedLog": {
                         "use": "log-dest-hsl"
                     }
@@ -31,6 +32,8 @@
                 "log-dest-hsl": {
                     "class": "Log_Destination",
                     "type": "remote-high-speed-log",
+                    "protocol": "udp",
+                    "distribution": "adaptive",
                     "pool": {
                         "use": "logPool"
                     }

@@ -12,6 +12,45 @@
             "class": "Tenant",
             "App_HTTPS":{
                 "class": "Application",
+                "remote-rsyslog-publisher": {
+                    "class": "Log_Publisher",
+                    "destinations": [
+                        {
+                            "use": "log-dest-rsyslog"
+                        }
+                    ]
+                },
+                "log-dest-rsyslog": {
+                    "class": "Log_Destination",
+                    "type": "remote-syslog",
+                    "format": "rfc5424",
+                    "remoteHighSpeedLog": {
+                        "use": "log-dest-hsl"
+                    }
+                },
+                "log-dest-hsl": {
+                    "class": "Log_Destination",
+                    "type": "remote-high-speed-log",
+                    "protocol": "udp",
+                    "distribution": "adaptive",
+                    "pool": {
+                        "use": "logPool"
+                    }
+                },
+                "logPool": {
+                    "class": "Pool",
+                    "monitors": [
+                        "icmp"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 514,
+                            "serverAddresses": [
+                                "10.0.2.151"
+                            ]
+                        }
+                    ]
+                },
                 "service": {
                     "class": "Service_HTTPS",
                     "virtualAddresses": [
@@ -45,8 +84,33 @@
                     "class": "HTTP_Profile",
                     "xForwardedFor": true
                 },
+                "crTLS13": {
+                    "class": "Cipher_Rule",
+                    "cipherSuites": [
+                        "TLSv1_3",
+                        "ECDHE-ECDSA-AES256-GCM-SHA384",
+                        "!DTLSv1_2"
+                    ],
+                    "namedGroups": [
+                        "DEFAULT"
+                    ],
+                    "signatureAlgorithms": [
+                        "DEFAULT"
+                    ]
+                },
+                "cgTLS13": {
+                    "class": "Cipher_Group",
+                    "allowCipherRules": [
+                        {
+                            "use": "crTLS13"
+                        }
+                    ]
+                },
                 "webTLS": {
                     "class": "TLS_Server",
+                    "cipherGroup": {
+                        "use": "cgTLS13"
+                    },
                     "certificates": [{
                         "certificate": "webcert"
                     }]
@@ -75,7 +139,7 @@
                     "collectMethod": true,
                     "collectOsAndBrowser": true,
                     "externalLoggingPublisher": {
-                        "bigip": "/Common/Shared/remote-rsyslog-publisher"
+                        "use": "remote-rsyslog-publisher"
                     }
                 }    
             }

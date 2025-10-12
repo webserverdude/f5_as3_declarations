@@ -1,0 +1,6 @@
+iRules/l7_waf_switching.tcl
+protected_f5vault
+testing_datadome.json
+tls_load_testing/iRule_snippets.txt
+other_old/*
+tls_load_testing/*
