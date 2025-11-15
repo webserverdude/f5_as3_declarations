@@ -1,0 +1,59 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "label": "",
+        "remark": "https://rickandmortyapi.com/documentation/#graphql",
+        "graphql": {
+            "class": "Tenant",
+            "https_app":{
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTPS",
+                    "redirect80": false,
+                    "virtualAddresses": [
+                        "192.168.57.65"
+                    ],
+                    "pool": "graphql_pool",
+                    "serverTLS": "webTLS",
+                    "clientTLS": {
+                        "bigip": "/Common/serverssl"
+                    },
+                    "profileHTTP": {
+                        "use": "httpProfile"
+                    }
+                },
+                "graphql_pool": {
+                    "class": "Pool",
+                    "members": [
+                        {
+                            "servicePort": 443,
+                            "addressDiscovery": "fqdn",
+                            "autoPopulate": true,
+                            "hostname": "rickandmortyapi.com"
+                        }
+                    ]
+                },
+                "httpProfile": {
+                    "class": "HTTP_Profile",
+                    "xForwardedFor": true
+                },
+                "webTLS": {
+                    "class": "TLS_Server",
+                    "certificates": [{
+                        "certificate": "webcert"
+                    }]
+                },
+                "webcert": {
+                    "class": "Certificate",
+                    "certificate": {"bigip":"/Common/default.crt"},
+                    "privateKey": {"bigip":"/Common/default.key"}
+                }
+            }
+        }
+    }
+}

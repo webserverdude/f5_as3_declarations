@@ -1,0 +1,5 @@
+curl --silent https://192.168.57.65/graphql \
+--header "Host: rickandmortyapi.com" \
+-k \
+--header "Content-Type: application/json" \
+--data '{"query":"query { characters(page: 2, filter: { name: \"rick\" }) { info { count } results { name } } location(id: 1) { id } episodesByIds(ids: [1, 2]) { id } }"}'

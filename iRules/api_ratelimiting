@@ -1,0 +1,44 @@
+# Enable (1) or disable (0) logging globally
+when RULE_INIT {
+    set static::debug 0
+}
+
+when HTTP_REQUEST priority 200 {
+    set real_client_ip ""
+    
+    if { [HTTP::header exists "X-Forwarded-For"] } {
+        set xff_header [HTTP::header "X-Forwarded-For"]
+        if { $xff_header ne "" } {
+            # Extract the first IP (trim whitespace)
+            set real_client_ip [string trim [lindex [split $xff_header ","] 0]]
+            if { $static::debug } { log local0. "Using first IP from XFF header: $real_client_ip" }
+        }
+    } else {
+        # If no valid XFF header found, use client IP
+        set real_client_ip [IP::client_addr]
+        if { $static::debug } { log local0. "No valid XFF header found, using client IP: $real_client_ip" }
+    }
+    
+    # Single point to replace XFF header
+    HTTP::header replace "X-Forwarded-For" $real_client_ip
+}
+
+
+# Access and analyze the HTTP header data for SLA value
+when HTTP_REQUEST priority 500 {
+    set sla [class lookup [HTTP::header value apikey] dg_apikeys]
+    if { $static::debug } {log local0. "Made it to HTTP_REQUEST event with SLA value $sla."}
+}
+
+# Evaluate SLA value during per-request access policy execution
+when ACCESS_PER_REQUEST_AGENT_EVENT {
+    set id [ACCESS::perflow get perflow.irule_agent_id]
+    if { $id eq "read-sla" } {
+    if { $static::debug } { log local0. "Made it to iRule agent in perrequest policy with SLA value $sla." }
+    # Store SLA and real client IP in perflow variables for later use
+    ACCESS::perflow set perflow.custom "$sla"
+    ACCESS::perflow set perflow.scratchpad "$real_client_ip"
+    }
+}
+
+# for i in {1..500}; do curl -s -o /dev/null -w "%{http_code}\n" --location 'http://192.168.57.175/' --header 'apikey: 9000' --header 'Content-Type: application/json' --header 'X-Forwarded-For: 3.3.3.3'; done

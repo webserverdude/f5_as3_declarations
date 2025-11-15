@@ -1,0 +1,17 @@
+when HTTP_REQUEST priority 500 {
+    # Get the requested URI
+    set uri [HTTP::uri]
+
+    # Look up the URI in the datagroup
+    # Replace "my_html_datagroup" with your actual datagroup name
+    set html_content [class match -value $uri equals /Common/Shared/my_html_datagroup]
+
+    # Check if content was found
+    if { $html_content ne "" } {
+        # Respond with the HTML content from the datagroup
+        HTTP::respond 200 content $html_content "Content-Type" "text/html; charset=utf-8" "Cache-Control" "no-cache"
+    } else {
+        # URI not found in datagroup - return 404
+        HTTP::respond 404 content "<html><body><h1>404 Not Found</h1><p>The requested URL was not found.</p></body></html>" "Content-Type" "text/html; charset=utf-8"
+    }
+}

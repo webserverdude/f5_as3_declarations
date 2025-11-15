@@ -1,0 +1,55 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "Common": {
+            "class": "Tenant",
+            "Shared": {
+                "class": "Application",
+                "template": "shared",
+                "rule_html_responses": {
+                    "class": "iRule",
+                    "iRule": {
+                        "base64": "d2hlbiBIVFRQX1JFUVVFU1QgcHJpb3JpdHkgNTAwIHsKICAgICMgR2V0IHRoZSByZXF1ZXN0ZWQgVVJJCiAgICBzZXQgdXJpIFtIVFRQOjp1cmldCgogICAgIyBMb29rIHVwIHRoZSBVUkkgaW4gdGhlIGRhdGFncm91cAogICAgIyBSZXBsYWNlICJteV9odG1sX2RhdGFncm91cCIgd2l0aCB5b3VyIGFjdHVhbCBkYXRhZ3JvdXAgbmFtZQogICAgc2V0IGh0bWxfY29udGVudCBbY2xhc3MgbWF0Y2ggLXZhbHVlICR1cmkgZXF1YWxzIC9Db21tb24vU2hhcmVkL215X2h0bWxfZGF0YWdyb3VwXQoKICAgICMgQ2hlY2sgaWYgY29udGVudCB3YXMgZm91bmQKICAgIGlmIHsgJGh0bWxfY29udGVudCBuZSAiIiB9IHsKICAgICAgICAjIFJlc3BvbmQgd2l0aCB0aGUgSFRNTCBjb250ZW50IGZyb20gdGhlIGRhdGFncm91cAogICAgICAgIEhUVFA6OnJlc3BvbmQgMjAwIGNvbnRlbnQgJGh0bWxfY29udGVudCAiQ29udGVudC1UeXBlIiAidGV4dC9odG1sOyBjaGFyc2V0PXV0Zi04IiAiQ2FjaGUtQ29udHJvbCIgIm5vLWNhY2hlIgogICAgfSBlbHNlIHsKICAgICAgICAjIFVSSSBub3QgZm91bmQgaW4gZGF0YWdyb3VwIC0gcmV0dXJuIDQwNAogICAgICAgIEhUVFA6OnJlc3BvbmQgNDA0IGNvbnRlbnQgIjxodG1sPjxib2R5PjxoMT40MDQgTm90IEZvdW5kPC9oMT48cD5UaGUgcmVxdWVzdGVkIFVSTCB3YXMgbm90IGZvdW5kLjwvcD48L2JvZHk+PC9odG1sPiIgIkNvbnRlbnQtVHlwZSIgInRleHQvaHRtbDsgY2hhcnNldD11dGYtOCIKICAgIH0KfQ=="
+                    }
+                },
+                "my_html_datagroup": {
+                    "class": "Data_Group",
+                    "storageType": "internal",
+                    "keyDataType": "string",
+                    "records": [
+                        {
+                            "key": "/index.html",
+                            "value": "<html><body><h1>Welcome</h1></body></html>"
+                        },
+                        {
+                            "key": "/about.html",
+                            "value": "<html><body><h1>About Us</h1></body></html>"
+                        }
+                    ]
+                }
+            }
+        },
+        "iRule_Shared": {
+            "class": "Tenant",
+            "App_HTTP":{
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTP",
+                    "virtualAddresses": [
+                        "192.168.57.151"
+                    ],
+                    "iRules": [
+                        {
+                            "bigip": "/Common/Shared/rule_html_responses"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
