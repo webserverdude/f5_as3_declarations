@@ -25,7 +25,22 @@
                     },
                     "profileHTTP": {
                         "use": "httpProfile"
+                    },
+                    "securityLogProfiles": [
+                        {
+                            "bigip": "/Common/Log all requests"
+                        }
+                    ],
+                    "policyWAF": {
+                        "use": "graphqlWAF"
                     }
+                },
+                "graphqlWAF": {
+                    "class": "WAF_Policy",
+                    "url":{
+                        "url": "https://raw.githubusercontent.com/webserverdude/f5_declarative_waf/refs/heads/main/graphql.json"
+                    },
+                    "ignoreChanges": false
                 },
                 "graphql_pool": {
                     "class": "Pool",
