@@ -38,7 +38,7 @@
                 "graphqlWAF": {
                     "class": "WAF_Policy",
                     "url":{
-                        "url": "https://raw.githubusercontent.com/webserverdude/f5_declarative_waf/refs/heads/main/graphql.json"
+                        "url": "https://raw.githubusercontent.com/webserverdude/f5_declarative_waf/refs/heads/main/policies/app-specific/graphql.json"
                     },
                     "ignoreChanges": false
                 },
