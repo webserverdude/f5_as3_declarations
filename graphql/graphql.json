@@ -42,6 +42,13 @@
                     },
                     "ignoreChanges": false
                 },
+                "baseWAF": {
+                    "class": "WAF_Policy",
+                    "url":{
+                        "url": "https://raw.githubusercontent.com/webserverdude/f5_declarative_waf/refs/heads/main/policies/base-policy.json"
+                    },
+                    "ignoreChanges": false
+                },
                 "graphql_pool": {
                     "class": "Pool",
                     "members": [
