@@ -4,3 +4,4 @@ testing_datadome.json
 tls_load_testing/iRule_snippets.txt
 other_old/*
 tls_load_testing/*
+customer_configs/*

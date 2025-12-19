@@ -1,0 +1,43 @@
+{
+    "class": "ADC",
+    "schemaVersion": "3.0.0",
+    "ltm_demo": {
+        "class": "Tenant",
+        "App_HTTP": {
+            "class": "Application",
+            "service": {
+                "class": "Service_HTTP",
+                "virtualPort": 80,
+                "virtualAddresses": [
+                    "192.168.57.152"
+                ],
+                "pool": "pl_ltm_demo",
+                "profileHTTP": {
+                    "use": "httpProfile"
+                },
+                "persistenceMethod": "none"
+            },
+            "httpProfile": {
+                "class": "HTTP_Profile",
+                "xForwardedFor": true
+            },
+            "pl_ltm_demo": {
+                "class": "Pool",
+                "monitors": [
+                    "http"
+                ],
+                "members": [
+                    {
+                        "servicePort": 8000,
+                        "serverAddresses": [
+                            "10.0.2.71", 
+                            "10.0.2.72",
+                            "10.0.2.73",
+                            "10.0.2.74"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}
