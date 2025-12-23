@@ -1,0 +1,5160 @@
+{
+  "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+  "class": "AS3",
+  "action": "deploy",
+  "declaration": {
+    "class": "ADC",
+    "schemaVersion": "3.45.0",
+    "id": "one-http-and-https-per-tenant-50-partitions-members-shareNodes",
+    "Tenant001": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.2"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.2"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant002": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.3"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.3"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant003": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.4"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.4"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant004": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.5"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.5"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant005": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.6"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.6"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant006": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.7"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.7"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant007": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.8"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.8"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant008": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.9"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.9"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant009": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.10"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.10"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant010": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.11"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.11"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant011": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.12"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.12"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant012": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.13"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.13"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant013": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.14"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.14"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant014": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.15"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.15"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant015": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.16"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.16"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant016": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.17"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.17"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant017": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.18"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.18"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant018": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.19"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.19"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant019": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.20"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.20"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant020": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.21"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.21"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant021": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.22"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.22"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant022": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.23"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.23"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant023": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.24"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.24"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant024": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.25"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.25"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant025": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.26"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.26"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant026": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.27"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.27"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant027": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.28"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.28"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant028": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.29"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.29"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant029": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.30"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.30"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant030": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.31"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.31"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant031": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.32"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.32"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant032": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.33"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.33"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant033": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.34"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.34"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant034": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.35"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.35"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant035": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.36"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.36"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant036": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.37"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.37"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant037": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.38"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.38"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant038": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.39"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.39"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant039": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.40"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.40"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant040": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.41"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.41"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant041": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.42"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.42"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant042": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.43"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.43"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant043": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.44"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.44"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant044": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.45"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.45"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant045": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.46"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.46"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant046": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.47"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.47"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant047": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.48"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.48"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant048": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.49"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.49"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant049": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.50"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.50"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    },
+    "Tenant050": {
+      "class": "Tenant",
+      "SampleApp": {
+        "class": "Application",
+        "template": "generic",
+        "tcpMonitor": {
+          "class": "Monitor",
+          "monitorType": "tcp"
+        },
+        "frontendtls": {
+          "class": "TLS_Server",
+          "certificates": [{
+            "certificate": "defaultCert"
+          }],
+          "tls1_3Enabled": true,
+          "cipherGroup": {
+            "use": "cg_tls13_tls12"
+          }
+        },
+        "defaultCert": {
+          "class": "Certificate",
+          "certificate": {"bigip": "/Common/default.crt"},
+          "privateKey": {"bigip": "/Common/default.key"}
+        },
+        "cr_tls13_tls12_EC": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-ECDSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cr_tls13_tls12_RSA": {
+          "class": "Cipher_Rule",
+          "cipherSuites": [
+            "TLSv1_3:ECDHE-RSA-AES256-GCM-SHA384:!DTLSv1_2"
+          ]
+        },
+        "cg_tls13_tls12": {
+          "class": "Cipher_Group",
+          "allowCipherRules": [
+            {
+              "use": "cr_tls13_tls12_EC"
+            },
+            {
+              "use": "cr_tls13_tls12_RSA"
+            }
+          ]
+        },
+        "web_pool_http": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 80,
+              "shareNodes": true
+            }
+          ]
+        },
+        "web_pool_https": {
+          "class": "Pool",
+          "monitors": [
+            {
+              "use": "tcpMonitor"
+            }
+          ],
+          "members": [
+            {
+              "serverAddresses": [
+                "10.10.20.2",
+                "10.10.20.3"
+              ],
+              "servicePort": 443,
+              "shareNodes": true
+            }
+          ]
+        },
+        "http_vs": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.10.10.51"
+          ],
+          "virtualPort": 80,
+          "pool": "web_pool_http"
+        },
+        "https_vs": {
+          "class": "Service_HTTPS",
+          "virtualAddresses": [
+            "10.10.10.51"
+          ],
+          "virtualPort": 443,
+          "pool": "web_pool_https",
+          "redirect80": false,
+          "serverTLS": "frontendtls"
+        }
+      }
+    }
+  }
+}
