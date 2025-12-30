@@ -5,3 +5,4 @@ tls_load_testing/iRule_snippets.txt
 other_old/*
 tls_load_testing/*
 customer_configs/*
+mcpd_testing/shared_partition/ssl_ec_keys/*
