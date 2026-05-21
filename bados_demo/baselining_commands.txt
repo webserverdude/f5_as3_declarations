@@ -1,6 +1,0 @@
-Use this command to determine the learning state of the bados policy:
-admd -s vs./bados/bados_service/service_http+/bados/bados_service/bados_profile.info.learning
-
-Recommended script selections:
-baseline Option 2
-dos Option 2
