@@ -1,0 +1,10 @@
+/favicon.ico
+/index_blue.html
+/index_green.html
+/index_red.html
+/index_yellow.html
+/scripts.js
+/styles_blue.css
+/styles_green.css
+/styles_red.css
+/styles_yellow.css

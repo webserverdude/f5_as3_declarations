@@ -1,0 +1,125 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "bados": {
+            "class":"Tenant",
+            "bados_service": {
+                "class": "Application",
+                "service_http": {
+                    "class": "Service_HTTP",
+                    "virtualPort": 80,
+                    "virtualAddresses": [
+                        "192.168.57.82"
+                    ],
+                    "pool": {
+                        "use": "ltm_demo_pool"
+                    },
+                    "profileHTTP": {
+                        "use": "pr_http_trust_xff"
+                    },
+                    "policyWAF": {
+                        "use": "waf_profile"
+                    },
+                    "profileDOS": {
+                        "use": "bados_profile"
+                    },
+                    "securityLogProfiles": [
+                        {"bigip": "/Common/Log all requests"},
+                        {"bigip": "/Common/local-dos"}
+                    ],
+                    "iRules": [
+                        {"use": "bados_xff_insert_iRule"}
+                    ]
+                },
+                "ltm_demo_pool": {
+                    "class": "Pool",
+                    "loadBalancingMode": "round-robin",
+                    "members": [
+                        {
+                            "servicePort": 8000,
+                            "serverAddresses": [
+                                "10.0.2.71",
+                                "10.0.2.72",
+                                "10.0.2.73",
+                                "10.0.2.74"
+                            ],  
+                            "shareNodes": true
+                        }
+                    ],
+                    "monitors": ["http"]
+                },
+                "pr_http_trust_xff": {
+                    "class": "HTTP_Profile",
+                    "trustXFF": true
+                },
+                "bados_profile": {
+                    "class": "DOS_Profile",
+                    "application": {
+                        "heavyURLProtection": {
+                            "automaticDetectionEnabled": true
+                        },
+                        "stressBasedDetection": {
+                            "operationMode": "blocking",
+                            "thresholdsMode": "automatic",
+                            "badActor": {
+                                "detectionEnabled": true,
+                                "useTlsPatternsForHostIdentification": true,
+                                "signatureDetectionEnabled": true,
+                                "tlsSignaturesEnabled": true,
+                                "mitigationMode": "standard"
+                            }
+                        }
+                    }
+                },
+                "waf_profile": {
+                    "class": "WAF_Policy",
+                    "url": "https://raw.githubusercontent.com/webserverdude/f5_declarative_waf/refs/heads/main/policies/base-policy.json",
+                    "ignoreChanges": false
+                },
+                "bados_xff_insert_iRule": {
+                    "class": "iRule",
+                    "iRule": {
+                        "base64": "d2hlbiBDTElFTlRfQUNDRVBURUQgewogICAgIyBnb29kIHRyYWZmaWMKICAgIGlmIHsgW2NsYXNzIG1hdGNoIFtJUDo6Y2xpZW50X2FkZHJdIGVxdWFscyAvYmFkb3MvYmFkb3Nfc2VydmljZS9nb29kX2lwc19kYXRhZ3JvdXBdIH0gewogICAgc2V0IHkgW2V4cHIgaW50KHJhbmQoKSo4KV0KICAgIHN3aXRjaCAtZ2xvYiAkeSB7CiAgICAgICAgMSB7CiAgICAgICAgICAgIHNldCBpcF9hZGRyIDE0OC4xNjUuW2V4cHIgaW50KHJhbmQoKSoyMDApXS5bZXhwciBpbnQocmFuZCgpKjEwMCldCiAgICAgICAgfQogICAgICAgIDIgewogICAgICAgICAgICBzZXQgaXBfYWRkciAyMDguMTUyLltleHByIGludChyYW5kKCkqMjAwKV0uW2V4cHIgaW50KHJhbmQoKSoxMDApXQogICAgICAgIH0gICAgICAgIAogICAgICAgIDMgewogICAgICAgICAgICBzZXQgaXBfYWRkciA3NC4yMDguW2V4cHIgaW50KHJhbmQoKSoyMDApXS5bZXhwciBpbnQocmFuZCgpKjEwMCldCiAgICAgICAgfSAgICAgICAKICAgICAgICA0IHsKICAgICAgICAgICAgc2V0IGlwX2FkZHIgMTM2LjE1Ni5bZXhwciBpbnQocmFuZCgpKjIwMCldLltleHByIGludChyYW5kKCkqMTAwKV0KICAgICAgICB9CiAgICAgICAgNSB7CiAgICAgICAgICAgIHNldCBpcF9hZGRyIDEwOS4xNzQuMTI4LltleHByIGludChyYW5kKCkqMTAwKV0KICAgICAgICB9CiAgICAgICAgNiB7CiAgICAgICAgICAgIHNldCBpcF9hZGRyIDIwMi4xNzIuOTYuW2V4cHIgaW50KHJhbmQoKSoxMDApXQogICAgICAgIH0KICAgICAgICA3IHsKICAgICAgICAgICAgc2V0IGlwX2FkZHIgMTc3LjQ3LjE2MC5bZXhwciBpbnQocmFuZCgpKjEwMCldCiAgICAgICAgfQogICAgICAgIGRlZmF1bHQgewogICAgICAgICAgICBzZXQgaXBfYWRkciAxMzcuMTMyLltleHByIGludChyYW5kKCkqMjAwKV0uW2V4cHIgaW50KHJhbmQoKSoxMDApXQogICAgICAgIH0KICAgIH0KfQoKICAgICMgYmFkIHRyYWZmaWMKICAgIGlmIHsgW2NsYXNzIG1hdGNoIFtJUDo6Y2xpZW50X2FkZHJdIGVxdWFscyAvYmFkb3MvYmFkb3Nfc2VydmljZS9iYWRfaXBzX2RhdGFncm91cF0gfSB7CiAgICBzZXQgeSBbZXhwciBpbnQocmFuZCgpKjUpXQogICAgc3dpdGNoIC1nbG9iICR5IHsKICAgICAgICAxIHsKICAgICAgICAgICAgc2V0IGlwX2FkZHIgMTg4LjE2MC41OS4xMFtleHByIGludChyYW5kKCkqMyldCiAgICAgICAgfQogICAgICAgIDIgewogICAgICAgICAgICBzZXQgaXBfYWRkciA5NC4xNDEuMTkyLjIwW2V4cHIgaW50KHJhbmQoKSozKV0KICAgICAgICB9ICAgIAogICAgICAgIDMgewogICAgICAgICAgICBzZXQgaXBfYWRkciAxNzUuNDUuMTc5LjlbZXhwciBpbnQocmFuZCgpKjMpXQogICAgICAgIH0KICAgICAgICA0IHsKICAgICAgICAgICAgc2V0IGlwX2FkZHIgMTc1LjQ1LjE3Ni41W2V4cHIgaW50KHJhbmQoKSoyKV0KICAgICAgICB9ICAgIAogICAgICAgIGRlZmF1bHQgewogICAgICAgICAgICBzZXQgaXBfYWRkciA0MS4xODkuMTkyLjIyW2V4cHIgaW50KHJhbmQoKSozKV0KICAgICAgICB9CiAgICB9Cgl9Cgp9Cgp3aGVuIEhUVFBfUkVRVUVTVCB7CiAgICBIVFRQOjpoZWFkZXIgaW5zZXJ0IFgtRm9yd2FyZGVkLUZvciAkaXBfYWRkcgogICAgbG9nIGxvY2FsMC4gIlgtRm9yd2FyZGVkLUZvcjogJGlwX2FkZHIiCn0="
+                    }
+                },
+                "good_ips_datagroup": {
+                    "class": "Data_Group",
+                    "storageType": "internal",
+                    "keyDataType": "ip",
+                    "records": [
+                        {
+                            "key": "192.168.57.10/32"
+                        },
+                        {
+                            "key": "192.168.57.11/32"
+                        },
+                        {
+                            "key": "192.168.57.1/32"
+                        }
+                    ]
+                },
+                "bad_ips_datagroup": {
+                    "class": "Data_Group",
+                    "storageType": "internal",
+                    "keyDataType": "ip",
+                    "records": [
+                        {
+                            "key": "192.168.57.12/32"
+                        },
+                        {
+                            "key": "192.168.57.13/32"
+                        },
+                        {
+                            "key": "192.168.57.14/32"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
