@@ -1,0 +1,54 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "f5-demo": {
+            "class": "Tenant",
+            "app_f5-demo": {
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTPS",
+                    "virtualAddresses": [
+                        "192.168.57.91"
+                    ],
+                    "pool": "pool_f5-demo",
+                    "serverTLS": "webTLS"
+                },
+                "pool_f5-demo" :{
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 8080,
+                            "serverAddresses": [
+                                "192.168.178.98"
+                            ],
+                            "shareNodes": true
+                        }
+                    ]
+                },
+                "webTLS": {
+                    "class": "TLS_Server",
+                    "certificates": [{
+                        "certificate": "webcert"
+                    }],
+                    "requireSNI": true,
+                    "cipherGroup": {
+                        "bigip": "/Common/f5-default"
+                    }
+                },
+                "webcert": {
+                    "class": "Certificate",
+                    "certificate": {"bigip":"/Common/f5-demo.appsec.rocks"},
+                    "privateKey": {"bigip":"/Common/f5-demo.appsec.rocks"}
+                }
+            }
+        }
+    }
+}

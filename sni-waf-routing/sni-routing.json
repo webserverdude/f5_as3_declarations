@@ -1,0 +1,36 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "sni_routing": {
+            "class": "Tenant",
+            "app_sni_routing": {
+                "class": "Application",
+                "service": {
+                    "class": "Service_TCP",
+                    "virtualType": "standard",
+                    "virtualAddresses": [
+                        "192.168.57.100"
+                    ],
+                    "virtualPort": 443,
+                    "iRules": [{
+                        "use": "rule_sni_routing"
+                    }],
+                    "persistenceMethods": [{
+                        "bigip": "/Common/ssl"
+                    }]
+                },
+                "rule_sni_routing": {
+                    "class": "iRule",
+                    "iRule": {
+                        "base64": "d2hlbiBDTElFTlRTU0xfQ0xJRU5USEVMTE8gcHJpb3JpdHkgMTAwIHsKICBpZiB7W1NTTDo6ZXh0ZW5zaW9ucyBleGlzdHMgLXR5cGUgMF19IHsKICAgIGJpbmFyeSBzY2FuIFtTU0w6OmV4dGVuc2lvbnMgLXR5cGUgMF0gQDlhKiBTTkkKICAgIGlmIHtbcmVnZXhwIHsoP2kpW15hLXowLTkuLV19ICRTTkldfSB7CiAgICAgIGxvZyBsb2NhbDAuICJDTElFTlRTU0xfQ0xJRU5USEVMTE8gY2xpZW50IG9mZmVyZWQgYm9ndXMgU05JOiAkU05JIgogICAgfSBlbHNlIHsKICAgICAgdmlydHVhbCBbY2xhc3MgbWF0Y2ggLXZhbHVlIC0tIFtzdHJpbmcgdG9sb3dlciAkU05JXSBlcXVhbHMgL0NvbW1vbi9kZ19zbmlfbWFwXQogICAgICByZXR1cm4KICAgIH0KICB9Cn0="
+                    }
+                }
+            }
+        }
+    }
+}

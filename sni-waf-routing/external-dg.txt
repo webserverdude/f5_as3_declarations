@@ -1,0 +1,2 @@
+"f5-demo.appsec.rocks" := "value1",
+"juiceshop.appsec.rocks" := "value2",

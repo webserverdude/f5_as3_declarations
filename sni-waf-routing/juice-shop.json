@@ -1,0 +1,54 @@
+{
+    "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/main/schema/latest/as3-schema.json",
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+    "declaration": {
+        "class": "ADC",
+        "schemaVersion": "3.0.0",
+        "juiceshop": {
+            "class": "Tenant",
+            "app_juiceshop": {
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTPS",
+                    "virtualAddresses": [
+                        "192.168.57.90"
+                    ],
+                    "pool": "pool_juiceshop",
+                    "serverTLS": "webTLS"
+                },
+                "pool_juiceshop" :{
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 3000,
+                            "serverAddresses": [
+                                "192.168.178.98"
+                            ],
+                            "shareNodes": true
+                        }
+                    ]
+                },
+                "webTLS": {
+                    "class": "TLS_Server",
+                    "certificates": [{
+                        "certificate": "webcert"
+                    }],
+                    "requireSNI": true,
+                    "cipherGroup": {
+                        "bigip": "/Common/f5-default"
+                    }
+                },
+                "webcert": {
+                    "class": "Certificate",
+                    "certificate": {"bigip":"/Common/juiceshop.appsec.rocks"},
+                    "privateKey": {"bigip":"/Common/juiceshop.appsec.rocks"}
+                }
+            }
+        }
+    }
+}
