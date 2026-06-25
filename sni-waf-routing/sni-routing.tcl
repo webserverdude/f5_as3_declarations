@@ -4,7 +4,7 @@ when CLIENTSSL_CLIENTHELLO priority 100 {
     if {[regexp {(?i)[^a-z0-9.-]} $SNI]} {
       log local0. "CLIENTSSL_CLIENTHELLO client offered bogus SNI: $SNI"
     } else {
-      virtual [class match -value -- [string tolower $SNI] equals /Common/dg_sni_map]
+      virtual [class match -value -- [string tolower $SNI] equals /sni_routing/app_sni_routing/datagroup_sni_routing]
       return
     }
   }

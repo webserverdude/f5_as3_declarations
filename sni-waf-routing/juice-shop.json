@@ -16,7 +16,13 @@
                         "192.168.57.90"
                     ],
                     "pool": "pool_juiceshop",
-                    "serverTLS": "webTLS"
+                    "serverTLS": "webTLS",
+                    "policyWAF": {
+                        "use": "waf_profile"
+                    },
+                    "securityLogProfiles": [
+                        {"bigip": "/Common/Log all requests"}
+                    ]
                 },
                 "pool_juiceshop" :{
                     "class": "Pool",
@@ -32,6 +38,11 @@
                             "shareNodes": true
                         }
                     ]
+                },
+                "waf_profile": {
+                    "class": "WAF_Policy",
+                    "url": "https://raw.githubusercontent.com/webserverdude/f5_declarative_waf/refs/heads/main/policies/base-policy.json",
+                    "ignoreChanges": false
                 },
                 "webTLS": {
                     "class": "TLS_Server",

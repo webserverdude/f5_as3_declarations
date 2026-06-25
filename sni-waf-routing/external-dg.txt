@@ -1,2 +1,2 @@
-"f5-demo.appsec.rocks" := "value1",
-"juiceshop.appsec.rocks" := "value2",
+"f5-demo.appsec.rocks" := "/f5-demo/app_f5-demo/service",
+"juiceshop.appsec.rocks" := "/juiceshop/app_juiceshop/service",
